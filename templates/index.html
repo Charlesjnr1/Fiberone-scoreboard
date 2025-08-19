@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Transform X Scoreboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Your existing styles here */
+    :root {
+      --team-a-gradient: linear-gradient(135deg, #b91c1c, #f87171);
+      --team-b-gradient: linear-gradient(135deg, #1d4ed8, #60a5fa);
+      --gray-ball: #9ca3af;
+      --red-ball: #dc2626;
+      --white-ball-border: #dc2626;
+      --bg-light: #f3f4f6;
+      --card-bg: #ffffff;
+      --text-dark: #111827;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-light);
+      margin: 0;
+      padding: 20px;
+      color: var(--text-dark);
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .logo-container img {
+      height: 60px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+    .scoreboard {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+      margin-top: 30px;
+      padding: 20px;
+      background-color: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    }
+    .team {
+      flex: 1 1 300px;
+      max-width: 400px;
+      padding: 25px;
+      border-radius: 14px;
+      text-align: center;
+      color: white;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .team.team-a {
+      background: var(--team-a-gradient);
+    }
+    .team.team-b {
+      background: var(--team-b-gradient);
+    }
+    .team:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    .team h3 {
+      font-size: 1.5em;
+      font-weight: 600;
+    }
+    .balls {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .ball {
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      font-weight: 700;
+      font-size: 1.1em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease;
+    }
+    .ball:hover {
+      transform: scale(1.1);
+    }
+    .ball.red { background: var(--red-ball); color: white; }
+    .ball.white { background: white; color: var(--red-ball); border: 2px solid var(--white-ball-border); }
+    .ball.gray { background: var(--gray-ball); color: white; }
+    .score {
+      font-size: 2.2em;
+      font-weight: bold;
+      margin-top: 25px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.15);
+    }
+    #winner-banner {
+      {% if winner %}
+        display: block;
+      {% else %}
+        display: none;
+      {% endif %}
+      font-size: 1.8rem;
+      padding: 15px 20px;
+      margin-top: 25px;
+      background: linear-gradient(90deg, gold, #ffd700);
+      color: #111;
+      font-weight: bold;
+      text-align: center;
+      border-radius: 12px;
+      animation: fadeIn 0.8s ease-in-out;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(-10px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+    .legend {
+      text-align: center;
+      margin-top: 25px;
+      font-size: 1em;
+      color: #6b7280;
+      font-weight: 500;
+    }
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2em;
+      }
+      .balls {
+        gap: 8px;
+      }
+      .ball {
+        width: 45px;
+        height: 45px;
+        font-size: 1em;
+      }
+    }
+    @keyframes pop {
+      0% { transform: scale(1); }
+      30% { transform: scale(1.3); color: gold; }
+      70% { transform: scale(1.3); color: gold; }
+      100% { transform: scale(1); color: inherit; }
+    }
+    .pop {
+      animation: pop 0.6s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logo-container">
+    <img src="{{ url_for('static', filename='img/FB_logo.png') }}" alt="Logo" />
+  </div>
+
+  <h1>GiGa School Competition</h1>
+
+  <div id="winner-banner">
+    {% if winner %}🏆 Winner: {{ winner }} 🏆{% endif %}
+  </div>
+
+  <div class="scoreboard">
+    <div class="team team-a">
+      <h3 id="team1_name">{{ data.team1.name }}</h3>
+      <div class="balls">
+        <div class="ball gray" id="team1_gray">{{ data.team1.score.gray }}</div>
+      </div>
+      <div class="score" id="team1_total">
+        {{ data.team1.score.red + data.team1.score.white + data.team1.score.gray }}
+      </div>
+    </div>
+
+    <div class="team team-b">
+      <h3 id="team2_name">{{ data.team2.name }}</h3>
+      <div class="balls">
+        <div class="ball gray" id="team2_gray">{{ data.team2.score.gray }}</div>
+      </div>
+      <div class="score" id="team2_total">
+        {{ data.team2.score.red + data.team2.score.white + data.team2.score.gray }}
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    Internet for Every School. Opportunity for Every Young Person.
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+<script>
+  const socket = io();
+
+  // Function to update the scoreboard UI
+  function renderScoreboard(scoreboard) {
+    // Update team names
+    document.getElementById('team1_name').textContent = scoreboard.team1.name;
+    document.getElementById('team2_name').textContent = scoreboard.team2.name;
+
+    // Update gray scores only
+    updateWithAnimation('team1_gray', scoreboard.team1.score.gray);
+    updateWithAnimation('team2_gray', scoreboard.team2.score.gray);
+
+    // Calculate totals (only gray now, since red & white are not used)
+    const team1Total = scoreboard.team1.score.gray;
+    const team2Total = scoreboard.team2.score.gray;
+
+    updateWithAnimation('team1_total', team1Total);
+    updateWithAnimation('team2_total', team2Total);
+
+    // Winner banner
+    const winnerBanner = document.getElementById('winner-banner');
+    if (scoreboard.winner) {
+      winnerBanner.style.display = 'block';
+      winnerBanner.textContent = `🏆 Winner: ${scoreboard.winner} 🏆`;
+    } else {
+      winnerBanner.style.display = 'none';
+    }
+  }
+
+  // Get initial scoreboard when page loads
+  fetch('/api/scoreboard')
+    .then(res => res.json())
+    .then(data => {
+      renderScoreboard(data);
+    })
+    .catch(err => console.error('Error fetching initial scoreboard:', err));
+
+  // Update scoreboard instantly when admin changes it
+  socket.on('score_update', data => {
+    renderScoreboard(data.data);
+  });
+
+  // Animation for score change
+  function updateWithAnimation(elementId, newValue) {
+    const el = document.getElementById(elementId);
+    if (el.textContent != newValue) {
+      el.textContent = newValue;
+      el.classList.remove('pop');
+      void el.offsetWidth; // reflow
+      el.classList.add('pop');
+    }
+  }
+</script>
+
+
+
+</body>
+</html>

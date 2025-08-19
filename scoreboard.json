@@ -1,0 +1,19 @@
+{
+  "team1": {
+    "name": "jacob Interl School",
+    "score": {
+      "red": 0,
+      "white": 0,
+      "gray": 34
+    }
+  },
+  "team2": {
+    "name": "fresh sckool",
+    "score": {
+      "red": 0,
+      "white": 0,
+      "gray": 45
+    }
+  },
+  "winner": "fresh sckool"
+}
